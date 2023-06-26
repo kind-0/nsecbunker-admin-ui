@@ -58,18 +58,18 @@
 
 <div class="h-full w-full flex flex-col justify-center items-center gap-8">
     <h1 class="h1">
-        nsecBunker admin UI
+        nsecBunker Admin UI
     </h1>
 
     <p>
-        This UI allows you to manage your nsecBunker.
+        Remotely administer your nsecBunker.
     </p>
 
-    <div class="rounded-lg bg-white/10 p-8 flex flex-col w-96 gap-4">
+    <div class="rounded-lg bg-white/10 p-8 flex flex-col w-full max-w-xl gap-4">
         <textarea bind:value={connectionString} class="
             rounded-lg
-            input text-lg bg-white/70 focus:bg-white w-full
-            text-black resize-none
+            input text-lg bg-white/70 w-full
+            text-white resize-none font-mono
             h-36
         " placeholder="nsecBunker connection URL" />
 
@@ -95,7 +95,7 @@
     <p class="text-center">
         Don't have an nsecBunker?
         <br>
-        <a href="#">
+        <a href="/new">
             Buy one here
         </a>
         or

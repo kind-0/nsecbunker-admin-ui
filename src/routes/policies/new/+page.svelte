@@ -27,6 +27,8 @@
             goto(`/policies`);
         });
     }
+
+    let rule: App.PolicyRule;
 </script>
 
 <div class="mx-auto max-w-prose my-4 flex flex-col gap-8">
@@ -56,16 +58,18 @@
         </ul>
 
 
-        <PolicyRule on:save={saveRule} />
+        <PolicyRule on:save={saveRule} bind:rule />
     </div>
 
-    <hr>
+    {#if !rule}
+        <hr>
 
-    <div class="flex flex-row items-center justify-between">
-        <button class="
-            btn variant-filled-primary
-        " disabled={policy.rules.length === 0}
-        on:click={savePolicy}
-        >Save Policy</button>
-    </div>
+        <div class="flex flex-row items-center justify-between">
+            <button class="
+                btn variant-filled-primary
+            " disabled={policy.rules.length === 0}
+            on:click={savePolicy}
+            >Save Policy</button>
+        </div>
+    {/if}
 </div>

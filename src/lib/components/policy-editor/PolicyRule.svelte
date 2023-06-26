@@ -2,7 +2,7 @@
     import { createEventDispatcher } from 'svelte';
 	import { kindToRule } from './utils';
 
-    let rule: App.PolicyRule | undefined = { method: 'sign_event' };
+    export let rule: App.PolicyRule | undefined = { method: 'sign_event' };
 
     let method: App.PolicyMethod | 'dms' = 'sign_event';
     let kind: string | number;

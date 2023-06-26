@@ -1,6 +1,7 @@
 <script lang='ts'>
 	// The ordering of these imports is critical to your app working properly
-	import '@skeletonlabs/skeleton/themes/theme-crimson.css';
+	import '../theme.postcss';
+	// import '@skeletonlabs/skeleton/themes/theme-crimson.css';
 	// If you have source.organizeImports set to true in VSCode, then it will auto change this ordering
 	import '@skeletonlabs/skeleton/styles/all.css';
 	// Most of your app wide CSS should be put in this file
@@ -14,6 +15,7 @@
 	import { bunkerRelays, remoteBunkerNpub, remoteBunkerPubkey } from "$lib/stores/user";
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
+	import { page } from '$app/stores';
 	import { requestIds, requestMap } from '$lib/stores/requests';
 	import AddNewKey from '$lib/components/modals/AddNewKey.svelte';
 
@@ -22,9 +24,15 @@
 	onMount(() => {
 	})
 
+	const noRedirectRoutes = [
+		'/login',
+		'/new',
+		'/bunker/[paymentHash]'
+	];
+
 	$: if (!$remoteBunkerNpub) {
 		// if not on login page
-		if (browser && window.location.pathname !== '/login')
+		if (browser && !noRedirectRoutes.includes($page.route.id))
 			goto('/login');
 	}
 
