@@ -55,21 +55,21 @@
     {:else if creating}
         Creating new key
     {:else}
-        <aside class="alert variant-outline-primary">
-            <div class="alert-message">
-                <h3 class="h3 font-bold">Add New Key</h3>
-                <p>
-                    Create a new key to be managed from your Bunker.
-                </p>
-            </div>
-        </aside>
+        <div>
+            <h3 class="h3 font-bold">Add New Key</h3>
+            <p class="font-thin opacity-60">
+                Create a new key to be managed from this Bunker.
+            </p>
+        </div>
+
+        <hr>
 
         <Stepper
             on:complete={createNewKey}
         >
             <Step locked={keyName.length === 0}>
                 <svelte:fragment slot="header">Key name</svelte:fragment>
-                <input class="input" type="text" placeholder="Key name" bind:value={keyName} />
+                <input class="input text-xl" type="text" placeholder="Key name" bind:value={keyName} />
                 <div class="text-white text-sm">
                     This name helps you identify the key. It's not used, or published, anywhere else.
                 </div>
@@ -85,9 +85,7 @@
                 <aside class="alert variant-ghost-secondary">
                     <div class="alert-message">
                         <div class="flex flex-col gap-3">
-                            <span>Your nsec is transmitted to your Bunker encrypted.</span>
-                            <span>Only the Bunker's key, which has never been transmitted over the internet, can decrypt it.</span>
-                            <span>Once in the Bunker, the nsec is encrypted with the passphrase you provide next.</span>
+                            <span>Your nsec is transmitted to your Bunker encrypted and stored on-disk encrypted with the passphrase provided in the next screen.</span>
                         </div>
                     </div>
                 </aside>

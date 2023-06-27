@@ -1,20 +1,22 @@
 <script lang="ts">
     import { remoteBunkerPubkey } from "$lib/stores/user";
-    import { ndk, rpc } from "$lib/stores/ndk";
-    import { loadKeys } from '$lib/nostr/keys/load.js'
+    import { loadKeys, type Key } from '$lib/nostr/keys/load.js'
 	import type { NDKSubscription } from "@nostr-dev-kit/ndk";
 	import { onDestroy, onMount } from "svelte";
 	import { requestIds, requestMap } from "$lib/stores/requests";
     import AclRequest from "./AclRequest.svelte";
 	import { modalStore, type ModalSettings } from "@skeletonlabs/skeleton";
     import KeyListItem from "$lib/components/keys/list-item.svelte";
+    import WithRetry from "$lib/components/WithRetry.svelte";
 
     let requestSub: NDKSubscription;
     let loadKeysPromise: Promise<any>;
 
-    onMount(async () => {
-        loadKeysPromise = loadKeys($remoteBunkerPubkey!);
-    })
+    const promiseCreator = () => loadKeys($remoteBunkerPubkey!);
+
+    onMount(() => {
+
+    });
 
     onDestroy(() => {
         requestSub?.stop()
@@ -36,21 +38,24 @@
     }
 
     function reloadKeys() {
-        loadKeysPromise = loadKeys($remoteBunkerPubkey!);
+        reloader++;
     }
+
+    let reloader = 0;
 </script>
 
 <div class="mx-auto max-w-prose my-4 flex flex-col gap-8">
-    {#if loadKeysPromise}
-        <div class="flex flex-row items-center justify-between">
-            <div class="text-2xl font-bold text-white">Keys</div>
+    <div class="flex flex-row items-center justify-between">
+        <div class="text-2xl font-bold text-white">Keys</div>
 
-            <button type="button" class="btn variant-filled" on:click={showAddKeyModal}>Add Key</button>
-        </div>
+        <button type="button" class="btn variant-filled-primary" on:click={showAddKeyModal}>Add Key</button>
+    </div>
 
-        {#await loadKeysPromise}
-            Loading
-        {:then keys}
+    {#key reloader}
+        <WithRetry
+            {promiseCreator}
+            let:value={keys}
+        >
             {#if keys.length === 0}
                 No keys created yet.
             {/if}
@@ -58,8 +63,8 @@
             {#each keys as key}
                 <KeyListItem {key} on:reloadKeys={reloadKeys} />
             {/each}
-        {/await}
-    {/if}
+        </WithRetry>
+    {/key}
 
     {#each $requestIds as requestId}
         {#if $requestMap[requestId].method === 'acl'}

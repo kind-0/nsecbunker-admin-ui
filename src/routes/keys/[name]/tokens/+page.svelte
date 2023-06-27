@@ -20,7 +20,7 @@
     <div class="flex flex-row items-center justify-between mb-4">
         <div class="text-2xl font-bold text-white">{name}'s tokens</div>
 
-        <a href="/keys/{name}/tokens/new" class="btn variant-filled">Add Token</a>
+        <a href="/keys/{name}/tokens/new" class="btn variant-filled-primary">Add Token</a>
     </div>
 
     <div class="alert variant-ghost-secondary">

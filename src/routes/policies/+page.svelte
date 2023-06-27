@@ -42,7 +42,7 @@
         <div class="flex flex-row items-center justify-between">
             <div class="text-2xl font-bold text-white">Policies</div>
 
-            <a href="/policies/new" type="button" class="btn variant-filled">New Policy</a>
+            <a href="/policies/new" type="button" class="btn variant-filled-primary">New Policy</a>
         </div>
 
         {#await loadPoliciesPromise}
