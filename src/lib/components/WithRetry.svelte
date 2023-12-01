@@ -73,7 +73,7 @@
                 </aside>
             {/if}
         {:else}
-            <p>Failed: #{error.message}</p>
+            <p>Failed: {error}</p>
         {/if}
     {/await}
 {/if}

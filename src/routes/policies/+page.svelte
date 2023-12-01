@@ -55,6 +55,8 @@
             {#each policies as policy}
                 <PolicyListItem {policy} on:reloadPolicies={reloadPolicies} />
             {/each}
+        {:catch e}
+            Error: {e}
         {/await}
     {/if}
 </div>

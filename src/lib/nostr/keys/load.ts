@@ -8,15 +8,17 @@ export type Key = {
 };
 
 export async function loadKeys(remotePubkey: string): Promise<Key[]> {
-    console.log('loadKeys', Math.floor(Date.now() / 1000));
     const rpc = getStore(rpcStore);
 
     if (!rpc) throw new Error('RPC not initialized');
 
-    const promise = new Promise<Key[]>((resolve) => {
+    const promise = new Promise<Key[]>((resolve, reject) => {
         // Send request for get_keys
         rpc.sendRequest(remotePubkey, 'get_keys', [], 24134, (response: NDKRpcResponse) => { // 24134
             const res = JSON.parse(response.result);
+
+            if (res[0] === 'error') reject(res[1]);
+
             resolve(res);
         });
     });

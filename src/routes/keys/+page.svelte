@@ -8,14 +8,18 @@
 	import { modalStore, type ModalSettings } from "@skeletonlabs/skeleton";
     import KeyListItem from "$lib/components/keys/list-item.svelte";
     import WithRetry from "$lib/components/WithRetry.svelte";
+	import EmptyKeyList from "$lib/components/EmptyKeyList.svelte";
+	import EmptyUserList from "$lib/components/EmptyUserList.svelte";
 
     let requestSub: NDKSubscription;
-    let loadKeysPromise: Promise<any>;
 
-    const promiseCreator = () => loadKeys($remoteBunkerPubkey!);
+    let promiseCreator: any;
 
     onMount(() => {
-
+        setTimeout(() => {
+            console.log('setting promise creator');
+            promiseCreator = () => loadKeys($remoteBunkerPubkey!);
+        }, 1000);
     });
 
     onDestroy(() => {
@@ -51,20 +55,26 @@
         <button type="button" class="btn variant-filled-primary" on:click={showAddKeyModal}>Add Key</button>
     </div>
 
-    {#key reloader}
-        <WithRetry
-            {promiseCreator}
-            let:value={keys}
-        >
-            {#if keys.length === 0}
-                No keys created yet.
-            {/if}
+    {#if promiseCreator}
+        {#key reloader}
+            <WithRetry
+                {promiseCreator}
+                let:value={keys}
+            >
+                {#if keys.length === 0}
+                    <EmptyKeyList />
+                {/if}
 
-            {#each keys as key}
-                <KeyListItem {key} on:reloadKeys={reloadKeys} />
-            {/each}
-        </WithRetry>
-    {/key}
+                {#each keys as key}
+                    <KeyListItem {key} on:reloadKeys={reloadKeys} />
+                {/each}
+
+                {#if keys.length === 1 && !keys.some(k => k.userCount > 0)}
+                    <EmptyUserList keyName={keys[0].name} />
+                {/if}
+            </WithRetry>
+        {/key}
+    {/if}
 
     {#each $requestIds as requestId}
         {#if $requestMap[requestId].method === 'acl'}

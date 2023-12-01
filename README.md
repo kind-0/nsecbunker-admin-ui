@@ -68,3 +68,7 @@ checkbox with "remember" option to the user).
 ### Users
 The users interface allows the administrator to manage the user keys that have access to each
 backend key.
+
+# Author
+
+* [pablof7z](https://nostr.me/npub1l2vyh47mk2p0qlsku7hg0vn29faehy9hy34ygaclpn66ukqp3afqutajft)

@@ -10,7 +10,7 @@
     let policy: App.Policy = {
         name: '',
         description: '',
-        createdBy: $currentUser?.hexpubkey()!,
+        createdBy: $currentUser?.hexpubkey!,
         rules: []
     };
 

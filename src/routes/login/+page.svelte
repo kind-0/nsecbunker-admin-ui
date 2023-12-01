@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bunkerRelays } from './../../lib/stores/user.ts';
+	import { bunkerRelays } from '$lib/stores/user.js';
 	import { goto } from "$app/navigation";
 	import { defaultExplicitRelayUrls, ndk } from "$lib/stores/ndk";
     import { remoteBunkerNpub } from "$lib/stores/user";
@@ -22,7 +22,7 @@
         }
 
         const [, protocol, npub, relayStr] = match;
-        const relays = relayStr ? relayStr.split(',') : undefined;
+        const relays = relayStr ? decodeURIComponent(relayStr).split(',') : undefined;
 
         return {
             protocol: protocol.toLowerCase(),
@@ -46,10 +46,15 @@
 
         $remoteBunkerNpub = npub;
         $bunkerRelays = relays ?? defaultExplicitRelayUrls;
-        $ndk = new NDK({
-            explicitRelayUrls: relays,
-            signer: new NDKNip07Signer()
-        });
+        try {
+            $ndk = new NDK({
+                explicitRelayUrls: relays,
+                signer: new NDKNip07Signer()
+            });
+        } catch (e) {
+            alert(e);
+            return;
+        }
         $ndk.connect(5000);
 
         goto("/");

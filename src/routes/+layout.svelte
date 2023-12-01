@@ -22,12 +22,14 @@
 	let rpcPromise: Promise<any> | undefined = undefined;
 
 	onMount(() => {
+		mounted = true;
 	})
 
 	const noRedirectRoutes = [
 		'/login',
 		'/new',
-		'/bunker/[paymentHash]'
+		'/bunker/[paymentHash]',
+		'/onboard'
 	];
 
 	$: if (!$remoteBunkerNpub) {
@@ -39,8 +41,12 @@
 	// Set the remoteBunkerPubkey if we have the remoteBunkerNpub
 	$: if (!$remoteBunkerPubkey && $remoteBunkerNpub) {
         const user = new NDKUser({npub: $remoteBunkerNpub});
-        $remoteBunkerPubkey = user.hexpubkey();
+        $remoteBunkerPubkey = user.hexpubkey;
     }
+
+	let mounted = false;
+
+	$: if (!$rpc && mounted) setup();
 
 	// initialize the NDK and connect
 	$: if ($remoteBunkerNpub && !$ndk) {
@@ -51,41 +57,53 @@
 		$ndk.connect(5000);
 	}
 
-	// $ndk.signer might be undefined when the app first loads since its provided by a browser extension
-	// attempt to load it every 100ms until it is available
-	const checkInterval = setInterval(() => {
-		// Once the signer is available, we can create the rpc client
-		if ($ndk?.signer) {
-			$ndk.signer.user().then((u) => {
-				$currentUser = u;
+	let checkInterval: NodeJS.Timeout;
 
-				$rpc = new NDKNostrRpc($ndk!, $ndk!.signer!, debug('nsecBunker:rpc'));
+	function setup() {
+		// $ndk.signer might be undefined when the app first loads since its provided by a browser extension
+		// attempt to load it every 100ms until it is available
+		checkInterval = setInterval(() => {
+			console.log('running interval');
+			// Once the signer is available, we can create the rpc client
+			if ($ndk?.signer) {
+				console.log('signer is available');
+				$ndk.signer.user().then((u) => {
+					try {
+						console.log('user is available');
+						$currentUser = u;
 
-				// Listen for incoming requests and add them to the requestIds and requestMap stores
-				$rpc!.on('request', (req: NDKRpcRequest) => {
-					$requestIds.push(req.id);
-					$requestMap[req.id] = req;
+						$rpc = new NDKNostrRpc($ndk!, $ndk!.signer!, debug('nsecBunker:rpc'));
+						console.log('rpc is available');
 
-					$requestIds = [...$requestIds];
+						// Listen for incoming requests and add them to the requestIds and requestMap stores
+						$rpc!.on('request', (req: NDKRpcRequest) => {
+							$requestIds.push(req.id);
+							$requestMap[req.id] = req;
 
-					// After 30 seconds, remove the request from the requestIds and requestMap stores
-					setTimeout(() => {
-						$requestIds = $requestIds.filter((id) => id !== req.id);
-						delete $requestMap[req.id];
-						$requestIds = [...$requestIds];
-					}, 300000);
-				});
+							$requestIds = [...$requestIds];
 
-				rpcPromise = $rpc!.subscribe({
-					kinds: [24134 as number], // 24134
-					authors: [$remoteBunkerPubkey!],
-					'#p': [$currentUser.hexpubkey()],
-				});
+							// After 30 seconds, remove the request from the requestIds and requestMap stores
+							setTimeout(() => {
+								$requestIds = $requestIds.filter((id) => id !== req.id);
+								delete $requestMap[req.id];
+								$requestIds = [...$requestIds];
+							}, 300000);
+						});
 
-				clearInterval(checkInterval);
-			})
-		}
-	}, 100);
+						rpcPromise = $rpc!.subscribe({
+							kinds: [24134 as number], // 24134
+							authors: [$remoteBunkerPubkey!],
+							'#p': [$currentUser.hexpubkey],
+						});
+
+						clearInterval(checkInterval);
+					} catch (e: any) {
+						alert(`Error: ${e.message}`);
+					}
+				})
+			}
+		}, 100);
+	}
 
 	const modalComponentRegistry: Record<string, ModalComponent> = {
 		addNewKey: { ref: AddNewKey },
@@ -121,12 +139,12 @@
 						>
 							Keys
 						</a>
-						<a
+						<!-- <a
 							class="btn btn-sm variant-ghost-surface"
 							href="/events"
 						>
 							Events
-						</a>
+						</a> -->
 
 						<a
 							class="btn btn-sm variant-ghost-surface"
@@ -157,7 +175,16 @@
 	{:else if currentUser}
 		{#await rpcPromise}
 		{:then}
-			<slot />
+			{#if !$rpc}
+				Initialing...
+				{#if $ndk?.signer}
+					NIP-07 signer is available
+				{:else}
+					NIP-07 signer is not available yet
+				{/if}
+			{:else}
+				<slot />
+			{/if}
 		{/await}
 	{/if}
 

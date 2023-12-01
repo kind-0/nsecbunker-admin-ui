@@ -255,7 +255,7 @@
                             </div>
                         {:then invoice}
                             <div class="bg-white rounded-md w-64 h-64">
-                                <QR text={invoice.payment_request} />
+                                <QR text={`lightning:${invoice.payment_request}`} />
                             </div>
                             <a href="lightning:{invoice.payment_request}" class="btn variant-filled-surface w-full">⚡️ Open in wallet</a>
 

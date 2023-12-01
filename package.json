@@ -40,7 +40,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@nostr-dev-kit/ndk": "^0.6.0",
+		"@nostr-dev-kit/ndk": "^2.2.0",
 		"@nostr-dev-kit/ndk-svelte-components": "^0.3.0",
 		"@prisma/client": "^4.16.1",
 		"@sveltejs/adapter-node": "^1.2.4",

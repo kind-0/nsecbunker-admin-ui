@@ -1,16 +1,35 @@
 import Docker from 'dockerode';
-import { create } from 'domain';
+import fs from 'fs';
 
 const docker = new Docker();
 
 export async function createContainer(npubs: string[], maxActiveSeats: number, id: string): Promise<string> {
+    const dataDir = process.env.DATA_DIR ?? "/home/pablo/bunkers/data";
+    const bunkerDir = `${dataDir}/bunkers/${id}`;
+
+    // create directory for bunker if it doesn't exist
+    if (!fs.existsSync(bunkerDir)) {
+        fs.mkdirSync(bunkerDir);
+    }
+
+    // check if dataDir/nsecbunker.db file exists, if not, copy it from defaults/
+    const dbFile = `${bunkerDir}/nsecbunker.db`;
+    if (!fs.existsSync(dbFile)) {
+        fs.copyFileSync(`${dataDir}/defaults/nsecbunker.db`, dbFile);
+    }
+
     const createOptions = {
         Image: 'pablof7z/nsecbunkerd',
         name: id,
         Env: [
             `ADMIN_NPUBS=${npubs.join(',')}`,
             `MAX_ACTIVE_SEATS=${maxActiveSeats}`,
-        ]
+        ],
+        HostConfig: {
+            Binds: [
+                [bunkerDir, '/app/config'].join(':')
+            ]
+        }
     };
 
     return new Promise<string>((resolve, reject) => {

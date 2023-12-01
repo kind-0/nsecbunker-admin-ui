@@ -1,11 +1,11 @@
 <script lang="ts">
     import { page } from '$app/stores';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
     import { clipboard } from '@skeletonlabs/skeleton';
 
     const {paymentHash} = $page.params;
 
-    let interval;
+    let interval: NodeJS.Timer;
 
     let LottiePlayer: any;
 
@@ -19,7 +19,11 @@
         LottiePlayer = module.LottiePlayer;
     });
 
-    let res;
+    onDestroy(() => {
+        clearInterval(interval);
+    });
+
+    let res: any;
 
     async function checkBunkerStatus() {
         const r = await fetch(`/api/bunker?id=${paymentHash}`);
@@ -46,8 +50,12 @@
                 {/if}
                 <h1>Your bunker has been deployed</h1>
 
-                <h4>
-                    This is your connection string. You will need it to connect to administrate your bunker.
+                <h3>
+                    This is your connection string.
+                </h3>
+
+                <h4 class="font-thin opacity-60">
+                    You will need it to connect to administrate your bunker.
                 </h4>
 
                 <div class="font-mono p-4 bg-primary-800 rounded-lg whitespace-normal break-all">{res.connectionString}</div>
@@ -57,8 +65,6 @@
                     Login
                 </a>
 
-            {:else if res}
-                {JSON.stringify(res)}
             {:else}
                 Deploying Bunker...
             {/if}

@@ -40,12 +40,14 @@ export function withRetry<T>(
             };
 
             const onReject = (error: any) => {
+                console.log(`on Reject with`, error);
+
                 clearTimeout(timeoutId!);
 
                 if (currentAttempt < retryCount) {
                     currentAttempt++;
                     if (onRetry) {
-                        onRetry(currentAttempt);
+                        setTimeout(() => onRetry(currentAttempt), 250);
                     }
                     console.log(`Retrying... (Attempt ${currentAttempt})`);
                     runPromise();
