@@ -127,14 +127,14 @@
                 px-4 py-2 rounded-md
             "
                 on:click={alwaysAllowCurrentKind}
-            >Always allow singing kind {event.kind}</button>
+            >Always allow signing kind {event.kind}</button>
 
             <button class="
                 bg-green-700
                 px-4 py-2 rounded-md
             "
                 on:click={alwaysAllowAnyKind}
-            >Always allow singing all kinds</button>
+            >Always allow signing all kinds</button>
         {:else}
             <button class="
                 bg-green-700
