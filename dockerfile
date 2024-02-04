@@ -21,6 +21,6 @@ COPY --from=build /app .
 # Install only runtime dependencies
 RUN npm install --only=production
 
-EXPOSE 30000
+EXPOSE 3000
 
 ENTRYPOINT [ "node", "./build/index.js" ]
